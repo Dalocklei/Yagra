@@ -7,23 +7,27 @@ header = 'Content-Type: text/html\n\n'
 
 formhtml = '''<HTML>
 <HEAD><TITLE>Sign Up</TITLE></HEAD>
-<BODY><H3>New User</H3>
-<FORM ACTION="/cgi-bin/signup.py">
-<INPUT TYPE=hidden NAME=action VALUE=edit>
-User Name:   <INPUT TYPE=text NAME=user_name SIZE=15><br />
-Password:    <INPUT TYPE=text NAME=user_passwd_1  SIZE=15><br />
-Password again:<INPUT TYPE=text NAME=user_passwd_2  SIZE=15><br />
-<INPUT TYPE=submit value="GO"></FORM>
-</BODY></HTML>'''
+<BODY>
+	<H3>New User</H3>
+	<FORM ACTION="/cgi-bin/signup.py">
+	<INPUT TYPE=hidden NAME=action VALUE=edit>
+	User Name:   <INPUT TYPE=text NAME=user_name SIZE=15><br />
+	Password:    <INPUT TYPE=text NAME=user_passwd_1  SIZE=15><br />
+	Password again:<INPUT TYPE=text NAME=user_passwd_2  SIZE=15><br />
+	<INPUT TYPE=submit value="GO"></FORM>
+</BODY>
+</HTML>'''
 
 def showForm():
     print header + formhtml
 
-resulthtml = '''<HTML><HEAD><TITLE></TITLE></HEAD>
+reshtml = '''<HTML>
+<HEAD><TITLE></TITLE></HEAD>
 <BODY>
-<p>%s</p>
-<input type="submit" value="back" onclick="location.href='/cgi-bin/login.py'"/>
-</BODY></HTML>'''
+	<p>%s</p>
+	<input type="submit" value="back" onclick="location.href='/cgi-bin/login.py'"/>
+</BODY>
+</HTML>'''
 
 #signup function
 def signup(uname, pwd1, pwd2):
@@ -56,8 +60,6 @@ def signup(uname, pwd1, pwd2):
 			print header + reshtml %("error: unable to fetch data!")			
 		
 		db.close()
-		
-
 
 
 def process():

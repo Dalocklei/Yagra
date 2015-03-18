@@ -20,7 +20,7 @@ username = form['action'].value
 
 # Test if the file is an image
 fname, fext = os.path.splitext(fileitem.filename)
-if (fext == '.jpg') or (fext == '.jpeg') or (fext == '.png') or (fext == '.bmp') or (fext == '.gif'):
+if (fext == '.jpg') or (fext == '.png') or (fext == '.gif'):
 	# Test if the file was uploaded
 	if fileitem.filename:
 		# strip leading path from file name to avoid directory traversal attacks
@@ -40,7 +40,7 @@ if (fext == '.jpg') or (fext == '.jpeg') or (fext == '.png') or (fext == '.bmp')
 		
 		db.close()
 		
-		message = 'The file "' + fn + '" was uploaded successfully'
+		message = 'The file was uploaded successfully! Please return back and REFRESH the web page!'
 	else:
 		message = 'No file was uploaded'
 else:
@@ -52,4 +52,4 @@ Content-Type: text/html\n
 <p>%s</p>
 click<input type="submit" value="here" onclick="window.history.back()"/>to return back!
 </body></html>
-""" % (message,)
+""" % (message)

@@ -31,9 +31,15 @@ mainhtml='''
 		Login Succeed! Hello %s!
 		<input type="submit" value="Log out" onclick="location.href='/cgi-bin/login.py'"/>
 	</div>
+		<H3>Your Image:</H3>
+		<img src="/cgi-bin/visit_image.py?username=%s" />
 	<div>
-		<p>Upload your image!</p>
-		<input type="submit" value="choose an image.." onclick="location.href='/cgi-bin/signup.py'"/>
+		<H3>Upload a new image:</H3>
+		   <form enctype="multipart/form-data" action="/cgi-bin/save_file.py" method="post">
+		   <INPUT TYPE=hidden NAME="action" VALUE=%s>
+		   <p>Choose an image(only support .jpg/.png/.gif): <input type="file" name="file" /></p>
+		   <p><input type="submit" value="Upload" /></p>
+		   </form>
 	</div>
 	</body>'''
 
@@ -66,7 +72,7 @@ def login(username, password):
 			else:
 				for row in results:
 					if row[0] == password:
-						print header + mainhtml %(username)
+						print header + mainhtml %(username,username,username)
 					else:
 						print header + errorhtml %("wrong password! please login again!")					
 		except:		
