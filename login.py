@@ -1,7 +1,10 @@
-#!C:\Python27\python.exe
+# Wrote by jialei 2015.03.17  
+# Email: leijia_0820@163.com
+# Function: login page for Yagra
 
 import cgi
 import MySQLdb
+import os
 
 header = 'Content-Type: text/html\n\n'
 formhtml='''
@@ -9,7 +12,7 @@ formhtml='''
 	<body>
 	<h1>Welcome to Yagra!</h1>
 	<div>
-		<form action="/cgi-bin/login.py" method="post">
+		<form action="./login.py" method="post">
 		<INPUT TYPE=hidden NAME=action VALUE=edit>
 		User Name: <input type="text" name="user_name"><br />
 		Password: <input type="text" name="password" /><br />
@@ -19,7 +22,7 @@ formhtml='''
 	</div>
 	<div>
 		<p>Not Registered?</p>
-		<input type="submit" value="Sign Up" onclick="location.href='/cgi-bin/signup.py'"/>
+		<input type="submit" value="Sign Up" onclick="location.href='./signup.py'"/>
 	</div>
 	</body>
 	</html>'''
@@ -29,13 +32,13 @@ mainhtml='''
 	<body>
 	<div>
 		Login Succeed! Hello %s!
-		<input type="submit" value="Log out" onclick="location.href='/cgi-bin/login.py'"/>
+		<input type="submit" value="Log out" onclick="location.href='./login.py'"/>
 	</div>
 		<H3>Your Image:</H3>
-		<img src="/cgi-bin/visit_image.py?username=%s" />
+		<img src="./visit_image.py?username=%s" />
 	<div>
 		<H3>Upload a new image:</H3>
-		   <form enctype="multipart/form-data" action="/cgi-bin/save_file.py" method="post">
+		   <form enctype="multipart/form-data" action="./save_file.py" method="post">
 		   <INPUT TYPE=hidden NAME="action" VALUE=%s>
 		   <p>Choose an image(only support .jpg/.png/.gif): <input type="file" name="file" /></p>
 		   <p><input type="submit" value="Upload" /></p>
@@ -47,7 +50,7 @@ errorhtml = '''
 	<HTML>
 	<BODY>
 		<p>%s</p>
-		<input type="submit" value="back" onclick="location.href='/cgi-bin/login.py'"/>
+		<input type="submit" value="back" onclick="location.href='./login.py'"/>
 	</BODY>
 	</HTML>'''	
 	
@@ -61,11 +64,15 @@ def login(username, password):
 		else:
 			print header + errorhtml %("password is null, please login again!")			
 	else:
-		db = MySQLdb.connect("127.0.0.1","root","","yagra")
+		if (os.getenv('SERVER_SOFTWARE') and os.getenv('SERVER_SOFTWARE').startswith('Google App Engine/')):
+			db = MySQLdb.connect(unix_socket='/cloudsql/myyagra:jialei', db='yagra', user='root')
+		else:
+			db = MySQLdb.connect(host='127.0.0.1', port=3306, db='yagra', user='root')
 		cursor = db.cursor()
 		query = "SELECT password FROM user_table WHERE username = '%s'" %(username)
 		try:
 			cursor.execute(query)
+			db.commit()
 			results = cursor.fetchall()
 			if not results:
 				print header + errorhtml %("user %s doesn't exist!" %(username))

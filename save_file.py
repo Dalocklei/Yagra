@@ -1,4 +1,7 @@
 #!C:\Python27\python.exe
+# Wrote by jialei 2015.03.17  
+# Email: leijia_0820@163.com
+# Function: Save the file uploaded by user
 
 import cgi
 import os
@@ -24,23 +27,22 @@ if (fext == '.jpg') or (fext == '.png') or (fext == '.gif'):
 	# Test if the file was uploaded
 	if fileitem.filename:
 		# strip leading path from file name to avoid directory traversal attacks
-		fn = os.path.basename(fileitem.filename)
-		filepath = 'files/' + username + fext
-		open(filepath, 'wb').write(fileitem.file.read())	# upload the image to the files directory
-
-		# update the image path in Database
-		db = MySQLdb.connect("127.0.0.1","root","","yagra")
+		image = fileitem.file.read()
+		# update the image blob in Database
+		if (os.getenv('SERVER_SOFTWARE') and os.getenv('SERVER_SOFTWARE').startswith('Google App Engine/')):
+			db = MySQLdb.connect(unix_socket='/cloudsql/myyagra:jialei', db='yagra', user='root')
+		else:
+			db = MySQLdb.connect(host='127.0.0.1', port=3306, db='yagra', user='root')
 		cursor = db.cursor()
-		query = "UPDATE user_table SET image_path = '%s' WHERE username = '%s'" %(filepath,username)
+		query = "UPDATE user_table SET image = %s WHERE username = %s"
 		try:
-			cursor.execute(query)
-			results = cursor.fetchall()			
-		except:		
-			message = 'failed to update the database'			
-		
-		db.close()
-		
-		message = 'The file was uploaded successfully! Please return back and REFRESH the web page!'
+			cursor.execute(query,(image,username))
+			db.commit()
+		except Error as e:		
+			message = 'Failed to update the database'			
+		finally:
+			db.close()
+			message = 'The file was uploaded successfully! Please return back and REFRESH the web page!'
 	else:
 		message = 'No file was uploaded'
 else:

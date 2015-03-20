@@ -1,32 +1,37 @@
-#!C:\Python27\python.exe
+# Wrote by jialei 2015.03.17  
+# Email: leijia_0820@163.com
+# Function: signup page for Yagra
 
 import cgi
 import MySQLdb
+import os
 
 header = 'Content-Type: text/html\n\n'
 
-formhtml = '''<HTML>
-<HEAD><TITLE>Sign Up</TITLE></HEAD>
-<BODY>
-	<H3>New User</H3>
-	<FORM ACTION="/cgi-bin/signup.py">
-	<INPUT TYPE=hidden NAME=action VALUE=edit>
-	User Name:   <INPUT TYPE=text NAME=user_name SIZE=15><br />
-	Password:    <INPUT TYPE=text NAME=user_passwd_1  SIZE=15><br />
-	Password again:<INPUT TYPE=text NAME=user_passwd_2  SIZE=15><br />
-	<INPUT TYPE=submit value="GO"></FORM>
-</BODY>
+formhtml = '''
+<HTML>
+	<HEAD><TITLE>Sign Up</TITLE></HEAD>
+	<BODY>
+		<H3>New User</H3>
+		<FORM ACTION="./signup.py">
+		<INPUT TYPE=hidden NAME=action VALUE=edit>
+		User Name:   <INPUT TYPE=text NAME=user_name SIZE=15><br />
+		Password:    <INPUT TYPE=text NAME=user_passwd_1  SIZE=15><br />
+		Password again:<INPUT TYPE=text NAME=user_passwd_2  SIZE=15><br />
+		<INPUT TYPE=submit value="GO"></FORM>
+	</BODY>
 </HTML>'''
 
 def showForm():
     print header + formhtml
 
-reshtml = '''<HTML>
-<HEAD><TITLE></TITLE></HEAD>
-<BODY>
-	<p>%s</p>
-	<input type="submit" value="back" onclick="location.href='/cgi-bin/login.py'"/>
-</BODY>
+reshtml = '''
+<HTML>
+	<HEAD><TITLE></TITLE></HEAD>
+	<BODY>
+		<p>%s</p>
+		<input type="submit" value="back" onclick="location.href='./login.py'"/>
+	</BODY>
 </HTML>'''
 
 #signup function
@@ -39,11 +44,15 @@ def signup(uname, pwd1, pwd2):
 	elif (pwd1 != pwd2):
 		print header + reshtml %("two password are not the same, please sign up again!")
 	else:	# insert into database
-		db = MySQLdb.connect("127.0.0.1","root","","yagra")
+		if (os.getenv('SERVER_SOFTWARE') and os.getenv('SERVER_SOFTWARE').startswith('Google App Engine/')):
+			db = MySQLdb.connect(unix_socket='/cloudsql/myyagra:jialei', db='yagra', user='root')
+		else:
+			db = MySQLdb.connect(host='127.0.0.1', port=3306, db='yagra', user='root')
 		cursor = db.cursor()
 		query = "SELECT username FROM user_table WHERE username = '%s'" %(uname)
 		try:
 			cursor.execute(query)
+			db.commit()
 			results = cursor.fetchall()
 			if not results:
 				sql = "INSERT INTO user_table(username, password) VALUES('%s', '%s')" %(uname, pwd1)
